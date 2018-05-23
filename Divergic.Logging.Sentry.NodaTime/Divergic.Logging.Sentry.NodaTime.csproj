@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NodaTime" Version="2.2.6" />
+    <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Divergic.Logging.Sentry\Divergic.Logging.Sentry.csproj" />
+  </ItemGroup>
+
+</Project>
