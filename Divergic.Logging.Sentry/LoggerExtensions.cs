@@ -14,6 +14,20 @@
         /// Logs critical information to the specified logger.
         /// </summary>
         /// <param name="logger">The logger.</param>
+        /// <param name="exception">The exception.</param>
+        /// <param name="contextData">The context data to include with the exception.</param>
+        public static void LogCriticalWithContext(
+            this ILogger logger,
+            Exception exception,
+            object contextData)
+        {
+            LogCriticalWithContext(logger, 0, exception, contextData, null);
+        }
+
+        /// <summary>
+        /// Logs critical information to the specified logger.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
         /// <param name="eventId">The event id.</param>
         /// <param name="exception">The exception.</param>
         /// <param name="contextData">The context data to include with the exception.</param>
@@ -24,6 +38,24 @@
             object contextData)
         {
             LogCriticalWithContext(logger, eventId, exception, contextData, null);
+        }
+
+        /// <summary>
+        /// Logs critical information to the specified logger.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        /// <param name="exception">The exception.</param>
+        /// <param name="contextData">The context data to include with the exception.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="args">The message arguments.</param>
+        public static void LogCriticalWithContext(
+            this ILogger logger,
+            Exception exception,
+            object contextData,
+            string message,
+            params object[] args)
+        {
+            LogCriticalWithContext(logger, 0, exception, contextData, message, args);
         }
 
         /// <summary>
@@ -47,7 +79,7 @@
 
             if (contextData != null)
             {
-                exception.WithContextData(contextData);
+                exception.AddContextData(contextData);
             }
 
             logger.Log<object>(
@@ -56,6 +88,20 @@
                 new FormattedLogValues(message, args),
                 exception,
                 MessageFormatter);
+        }
+
+        /// <summary>
+        /// Logs error information to the specified logger.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        /// <param name="exception">The exception.</param>
+        /// <param name="contextData">The context data to include with the exception.</param>
+        public static void LogErrorWithContext(
+            this ILogger logger,
+            Exception exception,
+            object contextData)
+        {
+            LogErrorWithContext(logger, 0, exception, contextData, null);
         }
 
         /// <summary>
@@ -72,6 +118,24 @@
             object contextData)
         {
             LogErrorWithContext(logger, eventId, exception, contextData, null);
+        }
+
+        /// <summary>
+        /// Logs error information to the specified logger.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        /// <param name="exception">The exception.</param>
+        /// <param name="contextData">The context data to include with the exception.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="args">The message arguments.</param>
+        public static void LogErrorWithContext(
+            this ILogger logger,
+            Exception exception,
+            object contextData,
+            string message,
+            params object[] args)
+        {
+            LogErrorWithContext(logger, 0, exception, contextData, message, args);
         }
 
         /// <summary>
@@ -95,7 +159,7 @@
 
             if (contextData != null)
             {
-                exception.WithContextData(contextData);
+                exception.AddContextData(contextData);
             }
 
             logger.Log<object>(

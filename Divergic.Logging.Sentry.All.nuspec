@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Divergic.Logging.Sentry.All</id>
+    <version>$(Build.BuildNumber)</version>
 
     <Title>NodaTime serialization for ILogger with Sentry.io</Title>
     <Authors>Rory Primrose</Authors>
@@ -11,17 +11,14 @@
     <PackageLicenseUrl>https://github.com/Divergic/Divergic.Logging.Sentry/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Divergic/Divergic.Logging.Sentry</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Divergic/Divergic.Logging.Sentry</RepositoryUrl>
-    <PackageTags>Sentry;Logging;NodaTime</PackageTags>
-    <IncludeSymbols>true</IncludeSymbols>
-  </PropertyGroup>
+    <PackageTags>Sentry;Logging;Autofac;NodaTime</PackageTags>
 
-  <ItemGroup>
-    <PackageReference Include="NodaTime" Version="2.2.6" />
-    <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Divergic.Logging.Sentry\Divergic.Logging.Sentry.csproj" />
-  </ItemGroup>
-
-</Project>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Divergic.Logging.Sentry" version="$(Build.BuildNumber)" />
+        <dependency id="Divergic.Logging.Sentry.Autofac" version="$(Build.BuildNumber)" />
+        <dependency id="Divergic.Logging.Sentry.NodaTime" version="$(Build.BuildNumber)" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

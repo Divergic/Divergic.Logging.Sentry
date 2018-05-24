@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+
+    <Title>Autofac Module for ILogger with Sentry.io</Title>
+    <Authors>Rory Primrose</Authors>
+    <Company>Divergic Ptd Ltd</Company>
+    <Description>This library contains an Autofac module to register a Sentry Raven client.</Description>
+    <Copyright>Copyright © Divergic Ptd Ltd 2018</Copyright>
+    <PackageLicenseUrl>https://github.com/Divergic/Divergic.Logging.Sentry/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Divergic/Divergic.Logging.Sentry</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Divergic/Divergic.Logging.Sentry</RepositoryUrl>
+    <PackageTags>Sentry;Logging;Autofac</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>

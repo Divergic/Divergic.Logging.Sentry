@@ -11,9 +11,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Divergic.Logging.Sentry.Nod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Divergic.Logging.Sentry.Autofac", "Divergic.Logging.Sentry.Autofac\Divergic.Logging.Sentry.Autofac.csproj", "{ACAB1747-405F-4678-B313-B13A8425DE8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divergic.Logging.Sentry.Autofac.UnitTests", "Divergic.Logging.Sentry.Autofac.UnitTests\Divergic.Logging.Sentry.Autofac.UnitTests.csproj", "{F59B2EAF-C3EB-46EE-B062-5CFCEDDD3553}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Divergic.Logging.Sentry.Autofac.UnitTests", "Divergic.Logging.Sentry.Autofac.UnitTests\Divergic.Logging.Sentry.Autofac.UnitTests.csproj", "{F59B2EAF-C3EB-46EE-B062-5CFCEDDD3553}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divergic.Logging.Sentry.NodaTime.UnitTests", "Divergic.Logging.Sentry.NodaTime.UnitTests\Divergic.Logging.Sentry.NodaTime.UnitTests.csproj", "{DDDAB462-455B-494D-A431-9E3486F9A409}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Divergic.Logging.Sentry.NodaTime.UnitTests", "Divergic.Logging.Sentry.NodaTime.UnitTests\Divergic.Logging.Sentry.NodaTime.UnitTests.csproj", "{DDDAB462-455B-494D-A431-9E3486F9A409}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{7ED45139-C14E-4584-8A0A-8C4D4CCC163B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{0D524C77-3D01-4BD3-93E8-D543C3CD8320}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6349EC7-FA01-41DC-8950-1F3D950F35A8}"
+	ProjectSection(SolutionItems) = preProject
+		Divergic.Logging.Sentry.All.nuspec = Divergic.Logging.Sentry.All.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +57,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1D42E6CC-0B85-4368-8FDE-D1CB8A346889} = {7ED45139-C14E-4584-8A0A-8C4D4CCC163B}
+		{F6EB7640-3041-4F02-AD4D-F1FA0ED2573B} = {0D524C77-3D01-4BD3-93E8-D543C3CD8320}
+		{69EEB722-702B-483E-809D-2327521C366F} = {7ED45139-C14E-4584-8A0A-8C4D4CCC163B}
+		{ACAB1747-405F-4678-B313-B13A8425DE8B} = {7ED45139-C14E-4584-8A0A-8C4D4CCC163B}
+		{F59B2EAF-C3EB-46EE-B062-5CFCEDDD3553} = {0D524C77-3D01-4BD3-93E8-D543C3CD8320}
+		{DDDAB462-455B-494D-A431-9E3486F9A409} = {0D524C77-3D01-4BD3-93E8-D543C3CD8320}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86D69A60-BDC1-46D5-A3E7-FEBB50362170}

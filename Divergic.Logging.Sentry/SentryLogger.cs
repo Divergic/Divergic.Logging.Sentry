@@ -77,9 +77,7 @@
                 Level = errorLevel,
                 Message = exception.Message,
                 Tags =
-                {
-                    ["logger"] = _name
-                }
+                    {["logger"] = _name}
             };
 
             _client.Capture(sentryEvent);

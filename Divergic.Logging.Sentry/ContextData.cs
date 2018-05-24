@@ -22,7 +22,7 @@ namespace System
         /// <param name="exception">The exception.</param>
         /// <param name="contextData">The context data.</param>
         /// <returns>The exception with context data appended.</returns>
-        public static Exception WithContextData(this Exception exception, object contextData)
+        public static Exception AddContextData(this Exception exception, object contextData)
         {
             Ensure.Any.IsNotNull(exception, nameof(exception));
             Ensure.Any.IsNotNull(contextData, nameof(contextData));

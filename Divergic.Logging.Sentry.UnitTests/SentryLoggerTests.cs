@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Reflection;
     using AsyncFriendlyStackTrace;
+    using Divergic.Logging.Sentry.UnitTests.Models;
     using FluentAssertions;
     using Microsoft.Extensions.Logging;
     using ModelBuilder;
@@ -22,9 +23,7 @@
             foreach (var value in values)
             {
                 yield return new[]
-                {
-                    value
-                };
+                    {value};
             }
         }
 
@@ -71,9 +70,7 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var exception = Model.Ignoring<ValueTypeException>(x => x.Data).Create<ValueTypeException>()
                 .Set(x => x.Id = value);
 
@@ -93,9 +90,7 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var exception = Model.Ignoring<WithNestedClassException>(x => x.Data).Create<WithNestedClassException>()
                 .Set(x => x.State = null);
 
@@ -115,9 +110,7 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
 
             var client = Substitute.For<IRavenClient>();
 
@@ -134,9 +127,7 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var exception = Model.Ignoring<ReadFailureException>(x => x.Data)
                 .Ignoring<ReadFailureException>(x => x.Failure).Ignoring<ReadFailureException>(x => x.State)
                 .Create<ReadFailureException>();
@@ -163,12 +154,10 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var exception = new AggregateException(Guid.NewGuid().ToString());
 
-            exception.WithContextData(state.Address);
+            exception.AddContextData(state.Address);
 
             var client = Substitute.For<IRavenClient>();
 
@@ -195,14 +184,12 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var first = Model.Ignoring<ValueTypeException>(x => x.Data).Create<ValueTypeException>();
             var second = Model.Ignoring<ValueTypeException>(x => x.Data).Create<ValueTypeException>();
             var exception = new AggregateException(Guid.NewGuid().ToString(), first, second);
 
-            exception.WithContextData(state.Address);
+            exception.AddContextData(state.Address);
 
             var client = Substitute.For<IRavenClient>();
 
@@ -221,9 +208,7 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var exception = new TimeoutException(Guid.NewGuid().ToString());
             var expectedLevel = ErrorLevel.Debug;
 
@@ -262,12 +247,10 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var exception = new TimeoutException(Guid.NewGuid().ToString());
 
-            exception.WithContextData(state.Address);
+            exception.AddContextData(state.Address);
 
             var client = Substitute.For<IRavenClient>();
 
@@ -285,20 +268,40 @@
         }
 
         [Fact]
+        public void LogSendsIncludesComplexPropertyWhenExtractingAdditionalDataTest()
+        {
+            var name = Guid.NewGuid().ToString();
+            var eventId = new EventId(Environment.TickCount);
+            var state = new AddressState
+                {Address = Guid.NewGuid().ToString()};
+            var company = Model.Create<Company>();
+            var exception = new EmptyException
+                {Company = company};
+
+            var client = Substitute.For<IRavenClient>();
+
+            var sut = new SentryLogger(name, client);
+
+            sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
+
+            client.Received(1).Capture(Arg.Any<SentryEvent>());
+            client.Received().Capture(
+                Arg.Is<SentryEvent>(x => x.Exception.Data.Contains("EmptyException.Company")));
+        }
+
+        [Fact]
         public void LogSendsNestedExceptionDetailsToSentryTest()
         {
             var value = Guid.NewGuid().ToString();
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var innerException = Model.Ignoring<ValueTypeException>(x => x.Data).Create<ValueTypeException>()
                 .Set(x => x.Id = value);
             var exception = new ArgumentNullException(Guid.NewGuid().ToString(), innerException);
 
-            exception.WithContextData(state.Address);
+            exception.AddContextData(state.Address);
 
             var client = Substitute.For<IRavenClient>();
 
@@ -311,14 +314,34 @@
         }
 
         [Fact]
+        public void LogSendsSkipsNullPropertyWhenExtractingAdditionalDataTest()
+        {
+            var name = Guid.NewGuid().ToString();
+            var eventId = new EventId(Environment.TickCount);
+            var state = new AddressState
+                {Address = Guid.NewGuid().ToString()};
+            var company = new Company();
+            var exception = new EmptyException
+                {Company = company};
+
+            var client = Substitute.For<IRavenClient>();
+
+            var sut = new SentryLogger(name, client);
+
+            sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
+
+            client.Received(1).Capture(Arg.Any<SentryEvent>());
+            client.Received().Capture(
+                Arg.Is<SentryEvent>(x => x.Exception.Data.Contains("EmptyException.Company") == false));
+        }
+
+        [Fact]
         public void LogSendsTypeReflectionLoadExceptionWithAdditionalContentTest()
         {
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString("N")
-            };
+                {Address = Guid.NewGuid().ToString("N")};
             var first = Model.Ignoring<ValueTypeException>(x => x.Data).Create<ValueTypeException>();
             var second = Model.Ignoring<WithNestedClassException>(x => x.Data).Create<WithNestedClassException>();
             var innerException = new ReflectionTypeLoadException(
@@ -334,7 +357,7 @@
                 });
             var exception = new AggregateException(Guid.NewGuid().ToString(), innerException);
 
-            exception.WithContextData(state.Address);
+            exception.AddContextData(state.Address);
 
             var client = Substitute.For<IRavenClient>();
 
@@ -366,9 +389,7 @@
             var name = Guid.NewGuid().ToString();
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
-            {
-                Address = Guid.NewGuid().ToString()
-            };
+                {Address = Guid.NewGuid().ToString()};
             var exception = Model.Ignoring<ValueTypeException>(x => x.Data).Create<ValueTypeException>();
 
             var client = Substitute.For<IRavenClient>();

@@ -1,8 +1,8 @@
 ﻿namespace Microsoft.Extensions.Logging
 {
+    using Divergic.Logging.Sentry;
     using EnsureThat;
     using SharpRaven;
-    using Divergic.Logging.Sentry;
 
     /// <summary>
     ///     The <see cref="LogFactoryExtensions" />

@@ -33,7 +33,7 @@
 
             var sut = new TimeoutException();
 
-            sut.WithContextData(value);
+            sut.AddContextData(value);
 
             var actual = sut.Data[ContextData.ContextDataKey].As<string>();
 
@@ -49,7 +49,7 @@
 
             var sut = new TimeoutException();
 
-            sut.WithContextData(value);
+            sut.AddContextData(value);
 
             var actual = sut.Data[ContextData.ContextDataKey].As<string>();
 
@@ -72,7 +72,7 @@
 
             var sut = new TimeoutException();
 
-            sut.WithContextData(value);
+            sut.AddContextData(value);
 
             var actual = sut.Data[ContextData.ContextDataKey];
 
@@ -87,7 +87,7 @@
         {
             var sut = new TimeoutException();
 
-            sut.WithContextData(value);
+            sut.AddContextData(value);
 
             var actual = sut.Data[ContextData.ContextDataKey];
 
@@ -104,8 +104,8 @@
 
             var sut = new TimeoutException();
 
-            sut.WithContextData(value);
-            sut.WithContextData(nextValue);
+            sut.AddContextData(value);
+            sut.AddContextData(nextValue);
 
             var actual = sut.Data[ContextData.ContextDataKey];
 
@@ -119,7 +119,7 @@
         {
             var sut = new TimeoutException();
 
-            Action action = () => sut.WithContextData(null);
+            Action action = () => sut.AddContextData(null);
 
             action.Should().Throw<ArgumentNullException>();
         }
@@ -129,7 +129,7 @@
         {
             var sut = (Exception) null;
 
-            Action action = () => sut.WithContextData(Guid.NewGuid().ToString());
+            Action action = () => sut.AddContextData(Guid.NewGuid().ToString());
 
             action.Should().Throw<ArgumentNullException>();
         }
