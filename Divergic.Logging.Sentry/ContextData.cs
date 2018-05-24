@@ -11,7 +11,10 @@ namespace System
     /// </summary>
     public static class ContextData
     {
-        private const string ContextDataKey = "ContextData";
+        /// <summary>
+        /// The key value used to store context data in <see cref="Exception.Data"/>.
+        /// </summary>
+        public const string ContextDataKey = "ContextData";
 
         /// <summary>
         /// Adds context data to the specified exception.

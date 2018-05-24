@@ -2,10 +2,9 @@
 {
     using System;
     using EnsureThat;
-    using SharpRaven;
-    using Divergic.Logging.Sentry;
     using NodaTime;
     using NodaTime.Serialization.JsonNet;
+    using SharpRaven;
 
     /// <summary>
     ///     The <see cref="LogFactoryExtensions" />
