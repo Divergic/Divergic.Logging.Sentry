@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Divergic.Logging.Sentry.NodaTime.xml</DocumentationFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <NeutralLanguage>en-US</NeutralLanguage>
 
     <Title>NodaTime serialization for ILogger with Sentry.io</Title>
     <Authors>Rory Primrose</Authors>

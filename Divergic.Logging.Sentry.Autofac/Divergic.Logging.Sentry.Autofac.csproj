@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Divergic.Logging.Sentry.Autofac.xml</DocumentationFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <NeutralLanguage>en-US</NeutralLanguage>
 
     <Title>Autofac Module for ILogger with Sentry.io</Title>
     <Authors>Rory Primrose</Authors>
