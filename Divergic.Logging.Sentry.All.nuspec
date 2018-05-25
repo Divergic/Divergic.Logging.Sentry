@@ -3,15 +3,16 @@
     <id>Divergic.Logging.Sentry.All</id>
     <version>$(Build.BuildNumber)</version>
 
-    <Title>NodaTime serialization for ILogger with Sentry.io</Title>
-    <Authors>Rory Primrose</Authors>
-    <Company>Divergic Ptd Ltd</Company>
-    <Description>This library contains support for NodaTime serialization when logging exceptions to Sentry.io.</Description>
-    <Copyright>Copyright © Divergic Ptd Ltd 2018</Copyright>
-    <PackageLicenseUrl>https://github.com/Divergic/Divergic.Logging.Sentry/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/Divergic/Divergic.Logging.Sentry</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Divergic/Divergic.Logging.Sentry</RepositoryUrl>
-    <PackageTags>Sentry;Logging;Autofac;NodaTime</PackageTags>
+    <title>NodaTime serialization for ILogger with Sentry.io</title>
+    <authors>Rory Primrose</authors>
+    <owners>Divergic Ptd Ltd</owners>
+    <summary>ILogger support for sending errors to Sentry.io.</summary>
+    <description>This library contains support for logging exceptions to Sentry.io with NodaTime and Autofac support.</description>
+    <copyright>Copyright © Divergic Ptd Ltd 2018</copyright>
+    <licenseUrl>https://github.com/Divergic/Divergic.Logging.Sentry/blob/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>https://github.com/Divergic/Divergic.Logging.Sentry</projectUrl>
+    <tags>Sentry;Logging;Autofac;NodaTime</tags>
 
     <dependencies>
       <group targetFramework=".NETStandard2.0">
