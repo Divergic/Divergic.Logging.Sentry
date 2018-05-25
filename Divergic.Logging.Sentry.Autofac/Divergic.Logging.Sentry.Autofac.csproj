@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Divergic.Logging.Sentry.Autofac.xml</DocumentationFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <NeutralLanguage>en-US</NeutralLanguage>
+
+    <Title>Autofac Module for ILogger with Sentry.io</Title>
+    <Authors>Rory Primrose</Authors>
+    <Company>Divergic Ptd Ltd</Company>
+    <Description>This library contains an Autofac module to register a Sentry Raven client.</Description>
+    <Copyright>Copyright © Divergic Ptd Ltd 2018</Copyright>
+    <PackageLicenseUrl>https://github.com/Divergic/Divergic.Logging.Sentry/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Divergic/Divergic.Logging.Sentry</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Divergic/Divergic.Logging.Sentry</RepositoryUrl>
+    <PackageTags>Sentry;Logging;Autofac</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Divergic.Logging.Sentry\Divergic.Logging.Sentry.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Divergic.Logging.Sentry.xml</DocumentationFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <NeutralLanguage>en-US</NeutralLanguage>
+
+    <Title>ILogger for Sentry.io</Title>
+    <Authors>Rory Primrose</Authors>
+    <Company>Divergic Ptd Ltd</Company>
+    <Description>This library contains an ILogger provider that sends errors to Sentry.io.</Description>
+    <Copyright>Copyright © Divergic Ptd Ltd 2018</Copyright>
+    <PackageLicenseUrl>https://github.com/Divergic/Divergic.Logging.Sentry/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Divergic/Divergic.Logging.Sentry</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Divergic/Divergic.Logging.Sentry</RepositoryUrl>
+    <PackageTags>Sentry;Logging</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ensure.That" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="AsyncFriendlyStackTrace" Version="1.6.0" />
+    <PackageReference Include="SharpRaven" Version="2.4.0" />
+  </ItemGroup>
+
+</Project>
