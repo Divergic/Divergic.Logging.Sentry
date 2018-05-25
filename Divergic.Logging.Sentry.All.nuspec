@@ -1,7 +1,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Divergic.Logging.Sentry.All</id>
-    <version>$(Build.BuildNumber)</version>
+    <version>$Version$</version>
 
     <title>NodaTime serialization for ILogger with Sentry.io</title>
     <authors>Rory Primrose</authors>
@@ -16,10 +16,14 @@
 
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Divergic.Logging.Sentry" version="$(Build.BuildNumber)" />
-        <dependency id="Divergic.Logging.Sentry.Autofac" version="$(Build.BuildNumber)" />
-        <dependency id="Divergic.Logging.Sentry.NodaTime" version="$(Build.BuildNumber)" />
+        <dependency id="Divergic.Logging.Sentry" version="$Version$" />
+        <dependency id="Divergic.Logging.Sentry.Autofac" version="$Version$" />
+        <dependency id="Divergic.Logging.Sentry.NodaTime" version="$Version$" />
       </group>
     </dependencies>
   </metadata>
+  
+  <files>
+    <file src="*" exclude="*" />
+  </files>
 </package>
