@@ -22,7 +22,7 @@ namespace Divergic.Logging.Sentry.IntegrationTests
             };
 
             var logger = new SentryLogger(typeof(SentryLoggerTests).FullName, client);
-            var data = Model.Create<Company>();
+            var data = Model.Create<Person>();
 
             try
             {
@@ -36,7 +36,12 @@ namespace Divergic.Logging.Sentry.IntegrationTests
 
         private async Task RunFailure()
         {
-            throw new TimeoutException();
+            var company = Model.Create<Company>();
+
+            throw new EmptyException
+            {
+                Company = company
+            };
         }
 
         private static ISentryConfig BuildConfiguration()
