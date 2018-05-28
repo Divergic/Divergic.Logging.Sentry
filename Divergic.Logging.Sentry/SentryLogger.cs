@@ -1,6 +1,7 @@
 ﻿namespace Divergic.Logging.Sentry
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
@@ -17,6 +18,7 @@
     /// </summary>
     public class SentryLogger : ILogger
     {
+        private const string SentryIdKey = "Sentry_Id";
         private static readonly JsonSerializerSettings _serializationSettings = BuildSerializerSettings();
         private readonly IRavenClient _client;
         private readonly string _name;
@@ -62,6 +64,13 @@
                 return;
             }
 
+            var recordedId = exception.Data[SentryIdKey] as string;
+
+            if (string.IsNullOrWhiteSpace(recordedId) == false)
+            {
+                return;
+            }
+
             var aggregate = exception as AggregateException;
 
             if (aggregate != null)
@@ -76,11 +85,14 @@
             {
                 Level = errorLevel,
                 Message = exception.Message,
-                Tags =
-                    {["logger"] = _name}
+                Tags = new ConcurrentDictionary<string, string>()
             };
 
-            _client.Capture(sentryEvent);
+            _client.Logger = _name;
+
+            var sentryId = _client.Capture(sentryEvent);
+
+            exception.Data[SentryIdKey] = sentryId;
         }
 
         private static JsonSerializerSettings BuildSerializerSettings()

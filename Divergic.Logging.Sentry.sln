@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Divergic.Logging.Sentry.Nod
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{7ED45139-C14E-4584-8A0A-8C4D4CCC163B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{0D524C77-3D01-4BD3-93E8-D543C3CD8320}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{0D524C77-3D01-4BD3-93E8-D543C3CD8320}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6349EC7-FA01-41DC-8950-1F3D950F35A8}"
 	ProjectSection(SolutionItems) = preProject
@@ -27,6 +27,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration Tests", "Integration Tests", "{792F2872-BD1B-4F24-A9C9-32A909F6AE9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divergic.Logging.Sentry.IntegrationTests", "Divergic.Logging.Sentry.IntegrationTests\Divergic.Logging.Sentry.IntegrationTests.csproj", "{75090707-0874-49B6-ABAE-8F5716F32DA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +62,10 @@ Global
 		{DDDAB462-455B-494D-A431-9E3486F9A409}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDDAB462-455B-494D-A431-9E3486F9A409}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDDAB462-455B-494D-A431-9E3486F9A409}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75090707-0874-49B6-ABAE-8F5716F32DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75090707-0874-49B6-ABAE-8F5716F32DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75090707-0874-49B6-ABAE-8F5716F32DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75090707-0874-49B6-ABAE-8F5716F32DA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +77,7 @@ Global
 		{ACAB1747-405F-4678-B313-B13A8425DE8B} = {7ED45139-C14E-4584-8A0A-8C4D4CCC163B}
 		{F59B2EAF-C3EB-46EE-B062-5CFCEDDD3553} = {0D524C77-3D01-4BD3-93E8-D543C3CD8320}
 		{DDDAB462-455B-494D-A431-9E3486F9A409} = {0D524C77-3D01-4BD3-93E8-D543C3CD8320}
+		{75090707-0874-49B6-ABAE-8F5716F32DA9} = {792F2872-BD1B-4F24-A9C9-32A909F6AE9A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86D69A60-BDC1-46D5-A3E7-FEBB50362170}
