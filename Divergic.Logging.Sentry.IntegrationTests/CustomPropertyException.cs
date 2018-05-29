@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class EmptyException : Exception
+    public class CustomPropertyException : Exception
     {
         public Company Company { get; set; }
     }

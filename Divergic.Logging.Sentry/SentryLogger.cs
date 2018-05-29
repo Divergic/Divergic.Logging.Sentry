@@ -19,7 +19,6 @@
     public class SentryLogger : ILogger
     {
         private const string SentryIdKey = "Sentry_Id";
-        private static readonly JsonSerializerSettings _serializationSettings = BuildSerializerSettings();
         private readonly IRavenClient _client;
         private readonly string _name;
 
@@ -95,18 +94,6 @@
             exception.Data[SentryIdKey] = sentryId;
         }
 
-        private static JsonSerializerSettings BuildSerializerSettings()
-        {
-            var settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                Formatting = Formatting.None
-            };
-
-            return settings;
-        }
-
         private static ErrorLevel GetErrorLevel(LogLevel level)
         {
             if (level == LogLevel.Critical)
@@ -165,7 +152,7 @@
                     return null;
                 }
 
-                var serialized = JsonConvert.SerializeObject(value, _serializationSettings);
+                var serialized = JsonConvert.SerializeObject(value, ContextData.SerializerSettings);
 
                 if (serialized == "{}")
                 {

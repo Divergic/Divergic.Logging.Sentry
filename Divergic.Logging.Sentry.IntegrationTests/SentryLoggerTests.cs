@@ -38,7 +38,7 @@ namespace Divergic.Logging.Sentry.IntegrationTests
         {
             var company = Model.Create<Company>();
 
-            throw new EmptyException
+            throw new CustomPropertyException
             {
                 Company = company
             };
