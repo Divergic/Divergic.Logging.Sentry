@@ -9,6 +9,27 @@
     public class LoggerExtensionsTests
     {
         [Fact]
+        public void LogCriticalWithContextUsesMessageFormatterToReturnStateTest()
+        {
+            var eventId = new EventId(Environment.TickCount);
+            var exception = new TimeoutException();
+            var message = Guid.NewGuid().ToString();
+
+            var log = Substitute.For<ILogger>();
+
+            log.When(x => x.Log(Arg.Any<LogLevel>(),  Arg.Any<EventId>(), Arg.Any<object>(), Arg.Any<Exception>(), Arg.Any<Func<object, Exception, string>>())).Do(
+                x =>
+                {
+                    var formatter = x.Arg<Func<object, Exception, string>>();
+                    var expected = formatter(x.Arg<object>(), x.Arg<Exception>());
+
+                    expected.Should().Be(message);
+                });
+
+            log.LogCriticalWithContext(eventId, exception, null, message);
+        }
+
+        [Fact]
         public void LogCriticalWithContextIgnoresNullDataTest()
         {
             var eventId = new EventId(Environment.TickCount);

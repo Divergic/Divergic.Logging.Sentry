@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Extensions.Logging
 {
     using System;
+    using Divergic.Logging.Sentry;
     using EnsureThat;
     using Microsoft.Extensions.Logging.Internal;
 

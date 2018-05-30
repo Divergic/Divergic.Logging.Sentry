@@ -38,7 +38,7 @@
 
             factory.AddSentryWithNodaTime(client);
 
-            ContextData.SerializerSettings.Converters
+            ExceptionData.SerializerSettings.Converters
                 .Any(x => x.GetType().FullName.StartsWith("NodaTime.Serialization.JsonNet.")).Should().BeTrue();
         }
 

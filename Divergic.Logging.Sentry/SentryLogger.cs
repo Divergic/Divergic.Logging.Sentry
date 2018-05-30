@@ -8,7 +8,6 @@
     using AsyncFriendlyStackTrace;
     using EnsureThat;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
     using SharpRaven;
     using SharpRaven.Data;
 
@@ -70,9 +69,7 @@
                 return;
             }
 
-            var aggregate = exception as AggregateException;
-
-            if (aggregate != null)
+            if (exception is AggregateException)
             {
                 exception.Data["AsyncException"] = exception.ToAsyncString();
             }
@@ -118,58 +115,7 @@
 
             return ErrorLevel.Debug;
         }
-
-        private static object GetPropertyValue(Exception exception, PropertyInfo property)
-        {
-            if (property.PropertyType.IsValueType)
-            {
-                // Push this value as is
-                var value = property.GetValue(exception);
-
-                return value;
-            }
-
-            if (property.PropertyType == typeof(string))
-            {
-                // Push this value as is
-                var value = property.GetValue(exception) as string;
-
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    return null;
-                }
-
-                return value;
-            }
-
-            try
-            {
-                // Attempt to serialize this value
-                var value = property.GetValue(exception);
-
-                if (value == null)
-                {
-                    return null;
-                }
-
-                var serialized = JsonConvert.SerializeObject(value, ContextData.SerializerSettings);
-
-                if (serialized == "{}")
-                {
-                    return null;
-                }
-
-                return serialized;
-            }
-#pragma warning disable CC0004 // Catch block cannot be empty
-            catch (Exception)
-            {
-                // We failed to serialize this value so ignore it
-                return null;
-            }
-#pragma warning restore CC0004 // Catch block cannot be empty
-        }
-
+        
         private static void StoreCustomExceptionProperties(Exception rootException, Exception exception)
         {
             if (exception.InnerException != null)
@@ -177,9 +123,7 @@
                 StoreCustomExceptionProperties(rootException, exception.InnerException);
             }
 
-            var aggregate = exception as AggregateException;
-
-            if (aggregate != null)
+            if (exception is AggregateException aggregate)
             {
                 foreach (var innerException in aggregate.InnerExceptions)
                 {
@@ -206,21 +150,21 @@
                 var keyName = typeName + "." + property.Name;
 
                 // Check that this key has not already been assigned
-                if (rootException.Data.Contains(keyName))
+                if (rootException.HasSerializedData(keyName))
                 {
                     continue;
                 }
 
                 try
                 {
-                    var value = GetPropertyValue(exception, property);
+                    var value = property.GetValue(exception);
 
                     if (value == null)
                     {
                         continue;
                     }
 
-                    rootException.Data[keyName] = value;
+                    rootException.AddSerializedData(keyName, value);
                 }
 #pragma warning disable CC0004 // Catch block cannot be empty
                 catch (Exception)

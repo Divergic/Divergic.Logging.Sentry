@@ -13,7 +13,7 @@
     using SharpRaven.Data;
     using Xunit;
 
-    public class SentryLoggerTests
+    public partial class SentryLoggerTests
     {
         public static IEnumerable<object[]> GetLogLevels()
         {
@@ -514,38 +514,6 @@
             Action action = () => new SentryLogger(name, null);
 
             action.Should().Throw<ArgumentNullException>();
-        }
-
-        private class AddressState
-        {
-            public string Address { get; set; }
-        }
-
-        private class ReadFailureException : Exception
-        {
-            public string Before { get; set; }
-
-            public string Failure { get { throw new InvalidOperationException(); } }
-
-            public string Other { get; set; }
-
-            public AddressState State { get { throw new InvalidOperationException(); } }
-        }
-
-        private class ValueTypeException : Exception
-        {
-            public DayOfWeek Day { get; set; }
-
-            public string Id { get; set; }
-
-            public int Number { get; set; }
-
-            public DateTimeOffset When { get; set; }
-        }
-
-        private class WithNestedClassException : Exception
-        {
-            public AddressState State { get; set; }
         }
     }
 }

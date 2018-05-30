@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Divergic.Logging.Sentry\Divergic.Logging.Sentry.csproj" />
+    <ProjectReference Include="..\Divergic.Logging.Sentry.NodaTime\Divergic.Logging.Sentry.NodaTime.csproj" />
   </ItemGroup>
 
   <ItemGroup>
