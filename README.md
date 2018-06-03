@@ -88,7 +88,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
     {
         Dsn = "Sentry DSN value here",
         Environment = "Local",
-        Version = "0.1.0
+        Version = "0.1.0"
     }
 
     var container = BuildContainer(sentryConfig);
