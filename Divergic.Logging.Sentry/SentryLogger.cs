@@ -3,11 +3,12 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    using AsyncFriendlyStackTrace;
     using EnsureThat;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Internal;
     using SharpRaven;
     using SharpRaven.Data;
 
@@ -17,6 +18,8 @@
     /// </summary>
     public class SentryLogger : ILogger
     {
+        private static readonly string _nullFormatted = new FormattedLogValues(null, null).ToString();
+
         private const string SentryIdKey = "Sentry_Id";
         private readonly IRavenClient _client;
         private readonly string _name;
@@ -69,9 +72,34 @@
                 return;
             }
 
-            if (exception is AggregateException)
+            var sentryEvent = CreateSentryEvent(logLevel, state, exception, formatter);
+
+            _client.Logger = _name;
+
+            var sentryId = _client.Capture(sentryEvent);
+
+            exception.Data[SentryIdKey] = sentryId;
+        }
+
+        private static SentryEvent CreateSentryEvent<TState>(LogLevel logLevel, TState state, Exception exception,
+            Func<TState, Exception, string> formatter)
+        {
+            // Fix up the async/await madness
+            var cleanedException = exception.Demystify();
+
+            exception.Data["CleanedException"] = cleanedException.ToString();
+
+            var formattedMessage = formatter(state, exception);
+
+            // Clear the message if it looks like a null formatted message
+            if (formattedMessage == _nullFormatted)
             {
-                exception.Data["AsyncException"] = exception.ToAsyncString();
+                formattedMessage = null;
+            }
+
+            if (string.IsNullOrWhiteSpace(formattedMessage) == false)
+            {
+                exception.Data["FormattedMessage"] = formattedMessage;
             }
 
             StoreCustomExceptionProperties(exception, exception);
@@ -84,11 +112,7 @@
                 Tags = new ConcurrentDictionary<string, string>()
             };
 
-            _client.Logger = _name;
-
-            var sentryId = _client.Capture(sentryEvent);
-
-            exception.Data[SentryIdKey] = sentryId;
+            return sentryEvent;
         }
 
         private static ErrorLevel GetErrorLevel(LogLevel level)
@@ -115,7 +139,7 @@
 
             return ErrorLevel.Debug;
         }
-        
+
         private static void StoreCustomExceptionProperties(Exception rootException, Exception exception)
         {
             if (exception.InnerException != null)

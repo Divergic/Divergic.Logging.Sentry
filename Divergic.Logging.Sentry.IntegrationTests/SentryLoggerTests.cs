@@ -2,40 +2,76 @@ namespace Divergic.Logging.Sentry.IntegrationTests
 {
     using System;
     using System.Threading.Tasks;
+    using Divergic.Logging.Xunit;
+    using global::Xunit;
+    using global::Xunit.Abstractions;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using ModelBuilder;
     using NodaTime;
-    using NodaTime.Serialization.JsonNet;
     using SharpRaven;
-    using Xunit;
 
     public class SentryLoggerTests
     {
-        private static readonly IRavenClient _client;
-        private static readonly ISentryConfig _config;
+        private readonly ILoggerFactory _factory;
 
-        static SentryLoggerTests()
+        public SentryLoggerTests(ITestOutputHelper output)
         {
-            _config = BuildConfiguration();
-            _client = new RavenClient(_config.Dsn)
+            var config = BuildConfiguration();
+
+            var client = new RavenClient(config.Dsn)
             {
-                Environment = _config.Environment,
-                Release = _config.Version
+                Environment = config.Environment,
+                Release = config.Version
             };
 
-            ExceptionData.SerializerSettings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            _factory = LogFactory.Create(output).AddSentryWithNodaTime(client);
+        }
+
+        [Fact]
+        public async Task LogComplexAsyncErrorSendsExceptionToSentryTest()
+        {
+            var logger = _factory.CreateLogger(nameof(SentryLoggerTests));
+            var data = Model.Ignoring<Person>(x => x.CreatedAt).Create<Person>()
+                .Set(x => x.CreatedAt = SystemClock.Instance.GetCurrentInstant());
+
+            try
+            {
+                await FailureGenerator.Execute().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogErrorWithContext(ex, data);
+            }
         }
 
         [Fact]
         public async Task LogErrorSendsExceptionToSentryTest()
         {
-            var logger = new SentryLogger(typeof(SentryLoggerTests).FullName, _client);
-            var data = Model.Ignoring<Person>(x => x.CreatedAt).Create<Person>().Set(x => x.CreatedAt = SystemClock.Instance.GetCurrentInstant());
+            var logger = _factory.CreateLogger(nameof(SentryLoggerTests));
+            var data = Model.Ignoring<Person>(x => x.CreatedAt).Create<Person>()
+                .Set(x => x.CreatedAt = SystemClock.Instance.GetCurrentInstant());
 
             try
             {
                 await RunFailure().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogErrorWithContext(ex, data);
+            }
+        }
+
+        [Fact]
+        public void LogSimpleErrorSendsExceptionToSentryTest()
+        {
+            var logger = _factory.CreateLogger(nameof(SentryLoggerTests));
+            var data = Model.Ignoring<Person>(x => x.CreatedAt).Create<Person>()
+                .Set(x => x.CreatedAt = SystemClock.Instance.GetCurrentInstant());
+
+            try
+            {
+                SimpleFailure();
             }
             catch (Exception ex)
             {
@@ -53,14 +89,11 @@ namespace Divergic.Logging.Sentry.IntegrationTests
             return configurationRoot.Get<SentryConfig>();
         }
 
-        private async Task RunFailure()
+        private Task RunFailure()
         {
             var company = Model
                 .Ignoring<Person>(x => x.CreatedAt)
-                .Create<Company>().Set(x =>
-                {
-                    x.Owner.CreatedAt = SystemClock.Instance.GetCurrentInstant();
-                });
+                .Create<Company>().Set(x => { x.Owner.CreatedAt = SystemClock.Instance.GetCurrentInstant(); });
 
             throw new CustomPropertyException
             {
@@ -68,6 +101,11 @@ namespace Divergic.Logging.Sentry.IntegrationTests
                 Value = Environment.TickCount,
                 Point = SystemClock.Instance.GetCurrentInstant()
             };
+        }
+
+        private void SimpleFailure()
+        {
+            throw new TimeoutException();
         }
     }
 }

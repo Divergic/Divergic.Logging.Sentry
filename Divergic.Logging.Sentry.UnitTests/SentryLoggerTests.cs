@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Reflection;
-    using AsyncFriendlyStackTrace;
     using Divergic.Logging.Sentry.UnitTests.Models;
     using FluentAssertions;
     using Microsoft.Extensions.Logging;
@@ -13,7 +13,7 @@
     using SharpRaven.Data;
     using Xunit;
 
-    public partial class SentryLoggerTests
+    public class SentryLoggerTests
     {
         public static IEnumerable<object[]> GetLogLevels()
         {
@@ -185,7 +185,8 @@
             client.Received().Capture(
                 Arg.Is<SentryEvent>(x => x.Exception.Data["ContextData"].As<string>() == state.Address));
             client.Received().Capture(
-                Arg.Is<SentryEvent>(x => x.Exception.Data["AsyncException"].As<string>() == exception.ToAsyncString()));
+                Arg.Is<SentryEvent>(x =>
+                    x.Exception.Data["CleanedException"].As<string>() == exception.Demystify().ToString()));
             client.Received().Capture(
                 Arg.Is<SentryEvent>(x => x.Exception.Data["StorageException.RequestInformation"] == null));
         }
@@ -214,6 +215,30 @@
 
             client.Received().Capture(
                 Arg.Is<SentryEvent>(x => x.Exception.Data["ValueTypeException.Id"].As<string>() == first.Id));
+        }
+
+        [Fact]
+        public void LogSendsExceptionToSentryOnlyIfNotAlreadySentTest()
+        {
+            var sentryId = Guid.NewGuid().ToString();
+            var name = Guid.NewGuid().ToString();
+            var eventId = new EventId(Environment.TickCount);
+            var state = new AddressState
+                {Address = Guid.NewGuid().ToString()};
+            var exception = new TimeoutException(Guid.NewGuid().ToString());
+
+            exception.AddContextData(state.Address);
+
+            var client = Substitute.For<IRavenClient>();
+
+            client.Capture(Arg.Any<SentryEvent>()).Returns(sentryId);
+
+            var sut = new SentryLogger(name, client);
+
+            sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
+            sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
+
+            client.Received(1).Capture(Arg.Any<SentryEvent>());
         }
 
         [Theory]
@@ -280,22 +305,19 @@
             sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
 
             client.Received(1).Capture(Arg.Any<SentryEvent>());
-            client.Received().Capture(Arg.Is<SentryEvent>(x => x.Level == ErrorLevel.Fatal));
-            client.Received().Capture(Arg.Is<SentryEvent>(x => x.Exception == exception));
-            client.Received().Capture(Arg.Is<SentryEvent>(x => x.Message == exception.Message));
-            client.Logger.Should().Be(name);
             client.Received().Capture(
                 Arg.Is<SentryEvent>(x => x.Exception.Data["ContextData"].As<string>().Contains(state.Address)));
         }
 
         [Fact]
-        public void LogSendsExceptionToSentryOnlyIfNotAlreadySentTest()
+        public void LogSendsFormattedMessageToSentryTest()
         {
-            var sentryId = Guid.NewGuid().ToString();
             var name = Guid.NewGuid().ToString();
-            var eventId = new EventId(Environment.TickCount);
+            var sentryId = Guid.NewGuid().ToString();
+            var message = Guid.NewGuid();
+            var arg = "123";
             var state = new AddressState
-                { Address = Guid.NewGuid().ToString() };
+                {Address = Guid.NewGuid().ToString()};
             var exception = new TimeoutException(Guid.NewGuid().ToString());
 
             exception.AddContextData(state.Address);
@@ -306,35 +328,11 @@
 
             var sut = new SentryLogger(name, client);
 
-            sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
-            sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
+            sut.LogError(exception, message + " {0}", arg);
 
             client.Received(1).Capture(Arg.Any<SentryEvent>());
-        }
-
-        [Fact]
-        public void LogStoresSentryIdInExceptionDataTest()
-        {
-            var expected = Guid.NewGuid().ToString();
-            var name = Guid.NewGuid().ToString();
-            var eventId = new EventId(Environment.TickCount);
-            var state = new AddressState
-                { Address = Guid.NewGuid().ToString() };
-            var exception = new TimeoutException(Guid.NewGuid().ToString());
-
-            exception.AddContextData(state.Address);
-
-            var client = Substitute.For<IRavenClient>();
-
-            client.Capture(Arg.Any<SentryEvent>()).Returns(expected);
-
-            var sut = new SentryLogger(name, client);
-
-            sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
-
-            var actual = exception.Data["Sentry_Id"] as string;
-
-            actual.Should().Be(expected);
+            client.Received().Capture(
+                Arg.Is<SentryEvent>(x => x.Exception.Data["FormattedMessage"].As<string>() == message + " " + arg));
         }
 
         [Fact]
@@ -360,6 +358,35 @@
             client.Received(1).Capture(Arg.Any<SentryEvent>());
             client.Received().Capture(
                 Arg.Is<SentryEvent>(x => x.Exception.Data.Contains("EmptyException.Company")));
+        }
+
+        [Fact]
+        public void LogSendsMessageToSentryTest()
+        {
+            var name = Guid.NewGuid().ToString();
+            var sentryId = Guid.NewGuid().ToString();
+            var message = Guid.NewGuid().ToString();
+            var state = new AddressState
+                {Address = Guid.NewGuid().ToString()};
+            var exception = new TimeoutException(Guid.NewGuid().ToString());
+
+            exception.AddContextData(state.Address);
+
+            var client = Substitute.For<IRavenClient>();
+
+            client.Capture(Arg.Any<SentryEvent>()).Returns(sentryId);
+
+            var sut = new SentryLogger(name, client);
+
+            sut.LogError(exception, message);
+
+            client.Received(1).Capture(Arg.Any<SentryEvent>());
+            client.Received().Capture(Arg.Is<SentryEvent>(x => x.Level == ErrorLevel.Error));
+            client.Received().Capture(Arg.Is<SentryEvent>(x => x.Exception == exception));
+            client.Received().Capture(Arg.Is<SentryEvent>(x => x.Message == exception.Message));
+            client.Logger.Should().Be(name);
+            client.Received().Capture(
+                Arg.Is<SentryEvent>(x => x.Exception.Data["FormattedMessage"].As<string>() == message));
         }
 
         [Fact]
@@ -412,6 +439,30 @@
             client.Received(1).Capture(Arg.Any<SentryEvent>());
             client.Received().Capture(
                 Arg.Is<SentryEvent>(x => x.Exception.Data.Contains("EmptyException.Company") == false));
+        }
+
+        [Fact]
+        public void LogSendsToSentryWithoutNullFormattedMessageTest()
+        {
+            var name = Guid.NewGuid().ToString();
+            var sentryId = Guid.NewGuid().ToString();
+            var state = new AddressState
+                {Address = Guid.NewGuid().ToString()};
+            var exception = new TimeoutException(Guid.NewGuid().ToString());
+
+            exception.AddContextData(state.Address);
+
+            var client = Substitute.For<IRavenClient>();
+
+            client.Capture(Arg.Any<SentryEvent>()).Returns(sentryId);
+
+            var sut = new SentryLogger(name, client);
+
+            sut.LogError(exception, null);
+
+            client.Received(1).Capture(Arg.Any<SentryEvent>());
+            client.Received().Capture(
+                Arg.Is<SentryEvent>(x => x.Exception.Data.Contains("FormattedMessage") == false));
         }
 
         [Fact]
@@ -492,6 +543,31 @@
             client.Received().Capture(
                 Arg.Is<SentryEvent>(
                     x => x.Exception.Data["ValueTypeException.When"].As<DateTimeOffset>() == exception.When));
+        }
+
+        [Fact]
+        public void LogStoresSentryIdInExceptionDataTest()
+        {
+            var expected = Guid.NewGuid().ToString();
+            var name = Guid.NewGuid().ToString();
+            var eventId = new EventId(Environment.TickCount);
+            var state = new AddressState
+                {Address = Guid.NewGuid().ToString()};
+            var exception = new TimeoutException(Guid.NewGuid().ToString());
+
+            exception.AddContextData(state.Address);
+
+            var client = Substitute.For<IRavenClient>();
+
+            client.Capture(Arg.Any<SentryEvent>()).Returns(expected);
+
+            var sut = new SentryLogger(name, client);
+
+            sut.Log(LogLevel.Critical, eventId, state, exception, (logState, ex) => ex.ToString());
+
+            var actual = exception.Data["Sentry_Id"] as string;
+
+            actual.Should().Be(expected);
         }
 
         [Theory]
