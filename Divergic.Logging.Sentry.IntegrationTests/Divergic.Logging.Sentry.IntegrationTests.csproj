@@ -11,6 +11,7 @@
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="ModelBuilder" Version="4.1.1" />
+    <PackageReference Include="Divergic.Logging.NodaTime" Version="0.1.0-ci0001" />
     <PackageReference Include="Divergic.Logging.Xunit" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" />
