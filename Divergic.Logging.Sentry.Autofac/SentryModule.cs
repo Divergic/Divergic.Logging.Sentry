@@ -23,7 +23,7 @@
                 };
 
                 return client;
-            }).As<IRavenClient>();
+            }).As<IRavenClient>().SingleInstance();
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿namespace Divergic.Logging.Sentry
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    using AsyncFriendlyStackTrace;
     using EnsureThat;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
+    using Microsoft.Extensions.Logging.Internal;
     using SharpRaven;
     using SharpRaven.Data;
 
@@ -17,7 +18,9 @@
     /// </summary>
     public class SentryLogger : ILogger
     {
-        private static readonly JsonSerializerSettings _serializationSettings = BuildSerializerSettings();
+        private static readonly string _nullFormatted = new FormattedLogValues(null, null).ToString();
+
+        private const string SentryIdKey = "Sentry_Id";
         private readonly IRavenClient _client;
         private readonly string _name;
 
@@ -62,11 +65,41 @@
                 return;
             }
 
-            var aggregate = exception as AggregateException;
+            var recordedId = exception.Data[SentryIdKey] as string;
 
-            if (aggregate != null)
+            if (string.IsNullOrWhiteSpace(recordedId) == false)
             {
-                exception.Data["AsyncException"] = exception.ToAsyncString();
+                return;
+            }
+
+            var sentryEvent = CreateSentryEvent(logLevel, state, exception, formatter);
+
+            _client.Logger = _name;
+
+            var sentryId = _client.Capture(sentryEvent);
+
+            exception.Data[SentryIdKey] = sentryId;
+        }
+
+        private static SentryEvent CreateSentryEvent<TState>(LogLevel logLevel, TState state, Exception exception,
+            Func<TState, Exception, string> formatter)
+        {
+            // Fix up the async/await madness
+            var cleanedException = exception.Demystify();
+
+            exception.Data["CleanedException"] = cleanedException.ToString();
+
+            var formattedMessage = formatter(state, exception);
+
+            // Clear the message if it looks like a null formatted message
+            if (formattedMessage == _nullFormatted)
+            {
+                formattedMessage = null;
+            }
+
+            if (string.IsNullOrWhiteSpace(formattedMessage) == false)
+            {
+                exception.Data["FormattedMessage"] = formattedMessage;
             }
 
             StoreCustomExceptionProperties(exception, exception);
@@ -76,23 +109,10 @@
             {
                 Level = errorLevel,
                 Message = exception.Message,
-                Tags =
-                    {["logger"] = _name}
+                Tags = new ConcurrentDictionary<string, string>()
             };
 
-            _client.Capture(sentryEvent);
-        }
-
-        private static JsonSerializerSettings BuildSerializerSettings()
-        {
-            var settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                Formatting = Formatting.None
-            };
-
-            return settings;
+            return sentryEvent;
         }
 
         private static ErrorLevel GetErrorLevel(LogLevel level)
@@ -120,57 +140,6 @@
             return ErrorLevel.Debug;
         }
 
-        private static object GetPropertyValue(Exception exception, PropertyInfo property)
-        {
-            if (property.PropertyType.IsValueType)
-            {
-                // Push this value as is
-                var value = property.GetValue(exception);
-
-                return value;
-            }
-
-            if (property.PropertyType == typeof(string))
-            {
-                // Push this value as is
-                var value = property.GetValue(exception) as string;
-
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    return null;
-                }
-
-                return value;
-            }
-
-            try
-            {
-                // Attempt to serialize this value
-                var value = property.GetValue(exception);
-
-                if (value == null)
-                {
-                    return null;
-                }
-
-                var serialized = JsonConvert.SerializeObject(value, _serializationSettings);
-
-                if (serialized == "{}")
-                {
-                    return null;
-                }
-
-                return serialized;
-            }
-#pragma warning disable CC0004 // Catch block cannot be empty
-            catch (Exception)
-            {
-                // We failed to serialize this value so ignore it
-                return null;
-            }
-#pragma warning restore CC0004 // Catch block cannot be empty
-        }
-
         private static void StoreCustomExceptionProperties(Exception rootException, Exception exception)
         {
             if (exception.InnerException != null)
@@ -178,9 +147,7 @@
                 StoreCustomExceptionProperties(rootException, exception.InnerException);
             }
 
-            var aggregate = exception as AggregateException;
-
-            if (aggregate != null)
+            if (exception is AggregateException aggregate)
             {
                 foreach (var innerException in aggregate.InnerExceptions)
                 {
@@ -207,21 +174,21 @@
                 var keyName = typeName + "." + property.Name;
 
                 // Check that this key has not already been assigned
-                if (rootException.Data.Contains(keyName))
+                if (rootException.HasSerializedData(keyName))
                 {
                     continue;
                 }
 
                 try
                 {
-                    var value = GetPropertyValue(exception, property);
+                    var value = property.GetValue(exception);
 
                     if (value == null)
                     {
                         continue;
                     }
 
-                    rootException.Data[keyName] = value;
+                    rootException.AddSerializedData(keyName, value);
                 }
 #pragma warning disable CC0004 // Catch block cannot be empty
                 catch (Exception)

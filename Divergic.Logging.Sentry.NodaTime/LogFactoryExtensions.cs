@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Extensions.Logging
 {
     using System;
+    using Divergic.Logging.Sentry;
     using EnsureThat;
     using NodaTime;
     using NodaTime.Serialization.JsonNet;
@@ -23,7 +24,7 @@
             Ensure.Any.IsNotNull(factory, nameof(factory));
             Ensure.Any.IsNotNull(client, nameof(client));
 
-            ContextData.SerializerSettings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            ExceptionData.SerializerSettings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
             factory.AddSentry(client);
 
