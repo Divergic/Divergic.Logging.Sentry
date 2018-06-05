@@ -16,8 +16,4 @@
     <PackageReference Include="NSubstitute" Version="3.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Divergic.Logging.Sentry.NodaTime\Divergic.Logging.Sentry.NodaTime.csproj" />
-  </ItemGroup>
-
 </Project>

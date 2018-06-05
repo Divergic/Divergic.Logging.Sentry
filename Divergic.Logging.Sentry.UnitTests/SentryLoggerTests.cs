@@ -424,9 +424,7 @@
             var eventId = new EventId(Environment.TickCount);
             var state = new AddressState
                 {Address = Guid.NewGuid().ToString()};
-            var company = new Company();
-            var exception = new EmptyException
-                {Company = company};
+            var exception = new EmptyException();
 
             var client = Substitute.For<IRavenClient>();
 

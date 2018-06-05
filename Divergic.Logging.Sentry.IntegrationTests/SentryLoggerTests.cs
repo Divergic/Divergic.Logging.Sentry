@@ -2,7 +2,9 @@ namespace Divergic.Logging.Sentry.IntegrationTests
 {
     using System;
     using System.Threading.Tasks;
+    using Divergic.Logging.Sentry.Autofac;
     using Divergic.Logging.Xunit;
+    using global::Autofac;
     using global::Xunit;
     using global::Xunit.Abstractions;
     using Microsoft.Extensions.Configuration;
@@ -18,14 +20,21 @@ namespace Divergic.Logging.Sentry.IntegrationTests
         public SentryLoggerTests(ITestOutputHelper output)
         {
             var config = BuildConfiguration();
+            var container = BuildContainer(config);
 
-            var client = new RavenClient(config.Dsn)
-            {
-                Environment = config.Environment,
-                Release = config.Version
-            };
+            var client = container.Resolve<IRavenClient>();
 
-            _factory = LogFactory.Create(output).AddSentryWithNodaTime(client);
+            _factory = LogFactory.Create(output).AddSentry(client).UsingNodaTimeTypes();
+        }
+
+        private IContainer BuildContainer(ISentryConfig config)
+        {
+            var builder = new ContainerBuilder();
+
+            builder.RegisterInstance(config).AsImplementedInterfaces();
+            builder.RegisterModule<SentryModule>();
+
+            return builder.Build();
         }
 
         [Fact]
