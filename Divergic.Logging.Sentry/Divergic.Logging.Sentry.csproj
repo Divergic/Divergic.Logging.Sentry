@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
-    <PackageReference Include="Divergic.Logging" Version="0.1.0-ci0001" />
+    <PackageReference Include="Divergic.Logging" Version="1.0.0" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
   </ItemGroup>
 
